@@ -1,9 +1,9 @@
 import P5, { Vector } from "p5";
 import { config } from "./config";
-import { Velocity, DropInstance } from "./types";
+import { DropInstance, p5, Velocity } from "./types";
 
 export default class Drop implements DropInstance {
-  p5: P5;
+  p5: p5;
   image: P5.Image;
   vector: P5.Vector;
   landed: boolean;
@@ -37,10 +37,12 @@ export default class Drop implements DropInstance {
         diff >= config.dropTimeout
           ? 0
           : this.p5.map(diff, config.dropTimeout, 0, 0, 1);
-      // @ts-ignore
-      // Type not available from @types/p5 currently
-      this.p5.drawingContext.globalAlpha = alpha;
+
+      if (typeof this.p5.drawingContext !== "undefined") {
+        this.p5.drawingContext.globalAlpha = alpha;
+      }
     }
+
     // translate to the point we want to rotate around, which is the top center of the drop
     this.p5.translate(this.position.x, this.position.y - this.image.height / 2);
     // rotate by the drops wobble value mapped between -PI/16 and PI/16
@@ -75,7 +77,7 @@ export default class Drop implements DropInstance {
       vector.x = newVector.x;
       position.x = p5.windowWidth - image.width;
     }
-    
+
     if (position.y + image.height >= p5.windowHeight) {
       position.y = p5.windowHeight - image.height;
       this.landed = true;
